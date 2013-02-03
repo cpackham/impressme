@@ -48,6 +48,8 @@ def generate_slides(file_, layout, out=sys.stdout):
             j += 1
         i += 1
 
+    out.write('<div id="overview" class="step" data-scale="5">\n</div>')
+
     # Summary
     try :
         summary = doc.getElementsByTagName("summary")[0]

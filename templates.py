@@ -4,7 +4,7 @@ header = """
 <html>
     <head>
         <meta name="viewport" content="width=1024" />
-        <link href="impress-demo.css" rel="stylesheet" />
+        <link href="impress/css/impress-demo.css" rel="stylesheet" />
     </head>
 
     <body class="impress-not-supported">
@@ -23,7 +23,7 @@ footer="""
     </div>
 
     <!-- load up impress.js -->
-    <script src="impress.js"></script>
+    <script src="impress/js/impress.js"></script>
     <script>impress().init();</script>
 </body>
 </html>
