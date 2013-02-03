@@ -31,4 +31,5 @@ footer="""
 
 title_tmpl = '<div class="step" data-x="%(x)d" data-y="%(y)d">'
 slide_tmpl = '<div class="step" data-x="%(x)d" data-y="%(y)d" data-rotate="%(r).1f">'
-summary_tmpl = '<div class="step" data-x="%(x)d" data-y="%(y)d" data-z="%(z)d" data-rotate-x="%(rx)d">'
+overview_tmpl = '<div id="overview" class="step" data-scale="5" data-x="%(x)d" data-y="%(y)d" data-rotate="%(r).1f">'
+summary_tmpl = '<div class="step" data-x="%(x)d" data-y="%(y)d" data-z="%(z)d" data-rotate="%(r).1f", data-rotate-x="%(rx)d">'
