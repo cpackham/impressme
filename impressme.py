@@ -54,7 +54,7 @@ def generate_slides(file_, layout, out=sys.stdout):
     try :
         summary = doc.getElementsByTagName("summary")[0]
         x,y,z,rx = l.summary_loc()
-        out.write(title_tmpl % {'x':x, 'y':y})
+        out.write(summary_tmpl % {'x':x, 'y':y, 'z':z, 'rx': rx})
         out.write(getText(summary.childNodes))
         out.write('\n</div>\n')
     except IndexError:
