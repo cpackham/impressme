@@ -36,16 +36,26 @@ class Radial:
 
     def title_loc(self):
         """title located in the center, no rotation"""
-        return (0, 0, 0, 0);
+        return {'data-x':'0',
+            'data-y':'0',
+            'data-z':'0',
+            'data-rotate':'0'};
 
     def overview_loc(self):
-       return (0, 0, 0, degrees(self.angle * self.sections))
+        return {'data-x':'0',
+            'data-y':'0',
+            'data-z':'0',
+            'data-scale':'5',
+            'data-rotate':'%.1f' % degrees(self.angle * self.sections)}
 
     def summary_loc(self):
         """summary located at the bottom, rotated 90 degrees around the x
         axis"""
-        return (0, self.radius * 3, -1000,
-                degrees(self.angle * self.sections), -90)
+        return {'data-x':'0',
+            'data-y':'%d' % (self.radius*3),
+            'data-z':'-1000',
+            'data-rotate':'%.1f' % degrees(self.angle * self.sections),
+            'data-rotate-x':'-90'}
 
     def slide_loc(self, section, slide):
         angle = self.angle * section
@@ -54,4 +64,7 @@ class Radial:
         y = int(radius * sin(angle))
         r = degrees(angle)
 
-        return (x, y, 0, r)
+        return {'data-x':'%d' % x,
+            'data-y':'%d' % y,
+            'data-z':'0',
+            'data-rotate':'%.1f' % degrees(angle)}

@@ -20,7 +20,7 @@ import sys
 from argparse import ArgumentParser
 from xml.dom.minidom import parse
 
-from templates import *
+from html import *
 from layout.radial import Radial
 
 def getText(nodelist):
@@ -38,18 +38,35 @@ def generate_slides(file_, layout, out=sys.stdout):
     except IOError as e:
         print >>sys.stderr, "error: %s" % str(e)
 
+    presentation = HTML()
+    head = Head()
+    head.add('<meta name="viewport" content="width=1024" />')
+    head.add('<link href="impress/css/impress-demo.css" rel="stylesheet" />')
+    presentation.add(head)
+    body = Body({'class':'impress-not-supported'})
+    presentation.add(body)
+    fb_div = Div({'class':'fallback-message'})
+    fb_div.add("""<p>Your browser <b>doesn\'t support the features
+        required</b> by impress.js, so you are presented with a simplified
+        version of this presentation.</p>""")
+    body.add(fb_div)
+    impress_div = Div({'id':'impress'})
+    body.add(impress_div)
+    body.add('<!-- load up impress.js -->')
+    body.add('<script src="impress/js/impress.js"></script>')
+    body.add('<script>impress().init();</script>')
+
     sections = doc.getElementsByTagName("section")
     l = layout(len(sections))
-
-    out.write(header)
 
     # Title page
     try:
         title = doc.getElementsByTagName("title")[0]
-        x,y,z,r = l.title_loc()
-        out.write(title_tmpl % {'x':x, 'y':y})
-        out.write(getText(title.childNodes))
-        out.write('\n</div>\n')
+        attr = {'class':'step'}
+        attr.update(l.title_loc())
+        div = Div(attr)
+        div.add(getText(title.childNodes))
+        impress_div.add(div)
     except IndexError:
         pass
 
@@ -58,29 +75,32 @@ def generate_slides(file_, layout, out=sys.stdout):
     for section in sections:
         j=1
         for slide in section.getElementsByTagName("slide"):
-            x,y,z,r = l.slide_loc(i,j)
-            out.write(slide_tmpl % {'x':x, 'y':y, 'r':r})
-            out.write(getText(slide.childNodes))
-            out.write('\n</div>\n')
+            attr = {'class':'step'}
+            attr.update(l.slide_loc(i,j))
+            div = Div(attr)
+            div.add(getText(slide.childNodes))
+            impress_div.add(div)
             j += 1
         i += 1
 
     # Overview
-    x,y,z,r = l.overview_loc()
-    out.write(overview_tmpl % {'x':x, 'y':y, 'r':r})
-    out.write('\n</div>\n')
+    attr = {'class':'step'}
+    attr.update(l.overview_loc())
+    div = Div(attr)
+    impress_div.add(div)
 
     # Summary
     try :
         summary = doc.getElementsByTagName("summary")[0]
-        x,y,z,r,rx = l.summary_loc()
-        out.write(summary_tmpl % {'x':x, 'y':y, 'z':z, 'r': r, 'rx': rx})
-        out.write(getText(summary.childNodes))
-        out.write('\n</div>\n')
+        attr = {'class':'step'}
+        attr.update(l.summary_loc())
+        div = Div(attr)
+        div.add(getText(summary.childNodes))
+        impress_div.add(div)
     except IndexError:
         pass
 
-    out.write(footer)
+    out.write(str(presentation))
 
 
 if __name__ == "__main__":
