@@ -22,6 +22,7 @@ from xml.dom.minidom import parse
 
 from html import *
 from layout.radial import Radial
+from layout.flat import Flat
 
 def getText(nodelist):
     rc = []
@@ -109,6 +110,9 @@ if __name__ == "__main__":
     parser.add_argument('--stylesheet', type=str, metavar="CSS",
             default="impress/css/impress-demo.css",
             help="use a different CSS stylesheet")
+    parser.add_argument('--layout', type=str,
+            choices=['radial','flat'], default='flat',
+            help="layout for presentation")
     parser.add_argument('file', type=file, metavar='FILE',
             help="XML file to process")
 
@@ -117,4 +121,9 @@ if __name__ == "__main__":
     except IOError as e:
         print >>sys.stderr, str(e)
         sys.exit(-1)
-    generate_slides(args.file, Radial, args.stylesheet)
+
+    for cls in [Radial, Flat]:
+        if cls.__name__.lower() == args.layout:
+            break
+
+    generate_slides(args.file, cls, args.stylesheet)
