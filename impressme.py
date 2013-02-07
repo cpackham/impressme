@@ -28,7 +28,7 @@ def getText(nodelist):
     rc = []
     for node in nodelist:
         if node.nodeType in [node.TEXT_NODE, node.CDATA_SECTION_NODE]:
-            rc.append(node.data)
+            rc.append(node.data.strip())
         else:
             rc.append(node.toxml())
     return ''.join(rc)
