@@ -58,7 +58,7 @@ class Radial:
             'data-rotate-x':'-90'}
 
     def slide_loc(self, section, slide):
-        angle = self.angle * section
+        angle = self.angle * (section-1)
         radius = self.radius * slide
         x = int(radius * cos(angle))
         y = int(radius * sin(angle))
