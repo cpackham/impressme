@@ -32,7 +32,7 @@ def getText(nodelist):
             rc.append(node.toxml())
     return ''.join(rc)
 
-def generate_slides(file_, layout, out=sys.stdout):
+def generate_slides(file_, cls, stylesheet, out=sys.stdout):
     try:
         doc = parse(file_)
     except IOError as e:
@@ -41,7 +41,7 @@ def generate_slides(file_, layout, out=sys.stdout):
     presentation = HTML()
     head = Head()
     head.add('<meta name="viewport" content="width=1024" />')
-    head.add('<link href="impress/css/impress-demo.css" rel="stylesheet" />')
+    head.add('<link href="%s" rel="stylesheet" />' % stylesheet)
     presentation.add(head)
     body = Body({'class':'impress-not-supported'})
     presentation.add(body)
@@ -57,13 +57,13 @@ def generate_slides(file_, layout, out=sys.stdout):
     body.add('<script>impress().init();</script>')
 
     sections = doc.getElementsByTagName("section")
-    l = layout(len(sections))
+    layout = cls(len(sections))
 
     # Title page
     try:
         title = doc.getElementsByTagName("title")[0]
         attr = {'class':'step'}
-        attr.update(l.title_loc())
+        attr.update(layout.title_loc())
         div = Div(attr)
         div.add(getText(title.childNodes))
         impress_div.add(div)
@@ -76,7 +76,7 @@ def generate_slides(file_, layout, out=sys.stdout):
         j=1
         for slide in section.getElementsByTagName("slide"):
             attr = {'class':'step'}
-            attr.update(l.slide_loc(i,j))
+            attr.update(layout.slide_loc(i,j))
             div = Div(attr)
             div.add(getText(slide.childNodes))
             impress_div.add(div)
@@ -85,7 +85,7 @@ def generate_slides(file_, layout, out=sys.stdout):
 
     # Overview
     attr = {'class':'step'}
-    attr.update(l.overview_loc())
+    attr.update(layout.overview_loc())
     div = Div(attr)
     impress_div.add(div)
 
@@ -93,7 +93,7 @@ def generate_slides(file_, layout, out=sys.stdout):
     try :
         summary = doc.getElementsByTagName("summary")[0]
         attr = {'class':'step'}
-        attr.update(l.summary_loc())
+        attr.update(layout.summary_loc())
         div = Div(attr)
         div.add(getText(summary.childNodes))
         impress_div.add(div)
@@ -106,7 +106,15 @@ def generate_slides(file_, layout, out=sys.stdout):
 if __name__ == "__main__":
     parser = ArgumentParser(
             description="Generate a presentation using impress.js")
-    parser.add_argument('file', type=file, metavar='FILE')
+    parser.add_argument('--stylesheet', type=str, metavar="CSS",
+            default="impress/css/impress-demo.css",
+            help="use a different CSS stylesheet")
+    parser.add_argument('file', type=file, metavar='FILE',
+            help="XML file to process")
 
-    args = parser.parse_args()
-    generate_slides(args.file, Radial)
+    try:
+        args = parser.parse_args()
+    except IOError as e:
+        print >>sys.stderr, str(e)
+        sys.exit(-1)
+    generate_slides(args.file, Radial, args.stylesheet)
