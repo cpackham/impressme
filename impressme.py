@@ -19,10 +19,22 @@
 import sys
 from argparse import ArgumentParser
 from xml.dom.minidom import parse
+from HTMLParser import HTMLParser
+from textwrap import wrap, fill
 
 from html import *
 from layout.radial import Radial
 from layout.flat import Flat
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self, out=sys.stdout):
+        HTMLParser.__init__(self)
+        self.out = out
+
+    def handle_data(self, data):
+        self.out.write(fill(data.strip()))
+        self.out.write("\n")
+
 
 def getText(nodelist):
     rc = []
@@ -103,6 +115,33 @@ def generate_slides(file_, cls, stylesheet, out=sys.stdout):
 
     out.write(str(presentation))
 
+def generate_notes(file_, out=sys.stdout):
+    parser = MyHTMLParser(out)
+
+    try:
+        doc = parse(file_)
+    except IOError as e:
+        print >>sys.stderr, "error: %s" % str(e)
+
+    try:
+        title = doc.getElementsByTagName("title")[0]
+        parser.feed(getText(title.childNodes))
+    except IndexError:
+        pass
+
+    for section in doc.getElementsByTagName("section"):
+        for slide in section.getElementsByTagName("slide"):
+            parser.feed(getText(slide.childNodes))
+            out.write("\n")
+
+    try :
+        summary = doc.getElementsByTagName("summary")[0]
+        parser.feed(getText(summary.childNodes))
+    except IndexError:
+        pass
+
+    out.write("\n")
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(
@@ -113,6 +152,8 @@ if __name__ == "__main__":
     parser.add_argument('--layout', type=str,
             choices=['radial','flat'], default='flat',
             help="layout for presentation")
+    parser.add_argument('--notes', action="store_true",
+            help="generate notes instead of slides")
     parser.add_argument('file', type=file, metavar='FILE',
             help="XML file to process")
 
@@ -126,4 +167,7 @@ if __name__ == "__main__":
         if cls.__name__.lower() == args.layout:
             break
 
-    generate_slides(args.file, cls, args.stylesheet)
+    if args.notes:
+        generate_notes(args.file)
+    else:
+        generate_slides(args.file, cls, args.stylesheet)
