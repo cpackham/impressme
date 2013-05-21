@@ -135,6 +135,12 @@ def generate_notes(file_, out=sys.stdout):
     try:
         title = doc.getElementsByTagName("title")[0]
         parser.feed(getText(title.childNodes))
+        note = getCommentText(title.childNodes)
+        if note:
+            out.write("\n" + "=" * 79 + "\n")
+            out.write(note)
+            out.write("\n" + "=" * 79 + "\n")
+
     except IndexError:
         pass
 
