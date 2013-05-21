@@ -35,15 +35,24 @@ class MyHTMLParser(HTMLParser):
         self.out.write(fill(data.strip()))
         self.out.write("\n")
 
+def strip(data):
+    return ' '.join(data.split())
 
 def getText(nodelist):
     rc = []
     for node in nodelist:
         if node.nodeType in [node.TEXT_NODE, node.CDATA_SECTION_NODE]:
-            rc.append(node.data.strip())
+            rc.append(strip(node.data))
         else:
             rc.append(node.toxml())
-    return ''.join(rc)
+    return '\n'.join(rc)
+
+def getCommentText(nodelist):
+    rc = []
+    for node in nodelist:
+        if node.nodeType == node.COMMENT_NODE:
+            rc.append(node.toxml())
+    return '\n'.join(rc)
 
 def generate_slides(file_, cls, stylesheet, out=sys.stdout):
     try:
@@ -131,8 +140,16 @@ def generate_notes(file_, out=sys.stdout):
 
     for section in doc.getElementsByTagName("section"):
         for slide in section.getElementsByTagName("slide"):
+            out.write("\n" + "-" * 79 + "\n")
             parser.feed(getText(slide.childNodes))
+            out.write("\n" + "-" * 79 + "\n")
             out.write("\n")
+
+            note = getCommentText(slide.childNodes)
+            if note:
+                out.write("\n" + "=" * 79 + "\n")
+                out.write(note)
+                out.write("\n" + "=" * 79 + "\n")
 
     try :
         summary = doc.getElementsByTagName("summary")[0]
